@@ -13,3 +13,13 @@ Comando usado para gerar as ADRs:
 ```
 /criador-adr @repo-base/descricao-desafio.md Vamos criar as ADRs com base no desafio. Use a skill para fazer essa atividade atendendo rigorosamente ao que o desafio pede. Os materiais de entrada são @repo-base/TRANSCRICAO.md e @repo-base/src/.
 ```
+
+## RFC
+
+O `docs/RFC.md` foi gerado pela skill `criador-rfc`, usando como entrada a transcrição da reunião (`TRANSCRICAO.md`), o código-fonte da aplicação e as 6 ADRs já fechadas nesta etapa do processo. O desafio exige que a documentação seja produzida depois de a decisão já ter sido tomada na reunião, o inverso do fluxo usual em que a RFC abre a discussão e as ADRs vêm depois. Deixei essa inversão explícita no comando, apontando que o raciocínio continua o mesmo (proposta, alternativas, questões em aberto), só a ordem de escrita dos documentos que mudou para se adequar ao material disponível. A skill extraiu do material o contexto do problema, a proposta técnica de alto nível e as alternativas descartadas na reunião, referenciando as ADRs já existentes em vez de repetir o detalhamento de cada decisão, e não precisou de nenhuma pergunta adicional para fechar o documento, já que a transcrição e as ADRs cobriam integralmente os campos exigidos pelo formato. O resultado saiu consistente com o restante do pacote já na primeira geração, sem correções necessárias na revisão.
+
+Comando usado para gerar o RFC:
+
+```
+/criador-rfc  @README.md @repo-base/TRANSCRICAO.md @repo-base/src/ use o criador de RFC para criar uma nova RFC para o projeto. Normalmente uma RFC é criada para discutir um assunto para tomar desições basendo-se nas discussões e posteriomente gerar a ADR a partir dela, mas a RFC está sendo criada depois porque a discussão ocorreu em uma reunião, que é a transcrição fornecida. O fluxo em si não mudou, mas a escrita dos documentos estão em ordem mais apropriada para melhorar o resultado do processo. Neste caso, tenha em vista as ADRs que já foram criadas em @repo-base/docs/adrs.
+```

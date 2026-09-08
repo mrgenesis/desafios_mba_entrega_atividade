@@ -1,7 +1,7 @@
 # Tracker de Rastreabilidade
 
-Tabela que mapeia cada item registrado nos documentos de design (ADRs) à sua origem real, na
-transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs.
+Tabela que mapeia cada item registrado nos documentos de design (RFC, ADRs) à sua origem real, na
+transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs e o RFC.
 
 | ID | Documento | Tipo | Conteúdo (resumo) | Fonte | Localização |
 | --- | --- | --- | --- | --- | --- |
@@ -52,3 +52,31 @@ transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação 
 | ADR-006-REF-04 | docs/adrs/ADR-006-reuso-dos-padroes-existentes-do-projeto.md | Referência | requireRole reaproveitado para autorização por papel | CODIGO | src/middlewares/auth.middleware.ts |
 | ADR-006-REF-05 | docs/adrs/ADR-006-reuso-dos-padroes-existentes-do-projeto.md | Referência | Logger Pino já configurado, reaproveitado sem nova lib | CODIGO | src/shared/logger/index.ts |
 | ADR-006-REF-06 | docs/adrs/ADR-006-reuso-dos-padroes-existentes-do-projeto.md | Referência | Padrão de módulo (controller/service/repository/routes/schemas) já em uso | CODIGO | src/modules/orders/order.service.ts |
+| RFC-CTX-01 | docs/RFC.md | Restrição | Clientes B2B pedem notificação em tempo real em vez de polling em GET /orders | TRANSCRICAO | [09:00] Marcos |
+| RFC-CTX-02 | docs/RFC.md | Restrição | "Tempo real" definido como abaixo de 10 segundos para os clientes | TRANSCRICAO | [09:02] Marcos |
+| RFC-CTX-03 | docs/RFC.md | Restrição | Atlas sinaliza risco de migrar para concorrente se a entrega atrasar | TRANSCRICAO | [09:00] Marcos |
+| RFC-CTX-04 | docs/RFC.md | Restrição | Escopo é outbound only, cliente não envia webhook de volta ao sistema | TRANSCRICAO | [09:02] Marcos |
+| RFC-CTX-05 | docs/RFC.md | Restrição | Transação de changeStatus já atualiza orders, history e estoque | TRANSCRICAO | [09:04] Bruno |
+| RFC-CTX-06 | docs/RFC.md | Referência | Método changeStatus é o ponto de integração da mudança de status | CODIGO | src/modules/orders/order.service.ts |
+| RFC-PROP-01 | docs/RFC.md | Elemento da Proposta | Outbox inserida via publishWebhookEvent(tx,...) na transação de changeStatus | TRANSCRICAO | [09:41] Bruno |
+| RFC-PROP-02 | docs/RFC.md | Elemento da Proposta | Worker em processo separado com polling de 2 segundos | TRANSCRICAO | [09:10] Larissa |
+| RFC-PROP-03 | docs/RFC.md | Elemento da Proposta | Retry com backoff exponencial e DLQ com endpoint de replay | TRANSCRICAO | [09:17] Larissa |
+| RFC-PROP-04 | docs/RFC.md | Elemento da Proposta | HMAC-SHA256 com secret por endpoint e rotação com grace period | TRANSCRICAO | [09:22] Sofia |
+| RFC-PROP-05 | docs/RFC.md | Elemento da Proposta | Garantia at-least-once com identificador único de evento | TRANSCRICAO | [09:26] Larissa |
+| RFC-PROP-06 | docs/RFC.md | Elemento da Proposta | Módulo webhooks segue estrutura e padrões já existentes no projeto | TRANSCRICAO | [09:30] Larissa |
+| RFC-PROP-07 | docs/RFC.md | Elemento da Proposta | CRUD de configuração de webhook por customer (POST/PATCH/DELETE/GET) | TRANSCRICAO | [09:31] Marcos |
+| RFC-PROP-08 | docs/RFC.md | Elemento da Proposta | Endpoint de histórico de entregas GET /webhooks/:id/deliveries | TRANSCRICAO | [09:34] Marcos |
+| RFC-PROP-09 | docs/RFC.md | Elemento da Proposta | Filtro de eventos por status aplicado na inserção da outbox, não no envio | TRANSCRICAO | [09:34] Bruno |
+| RFC-ALT-01 | docs/RFC.md | Alternativa Descartada | Disparo síncrono em changeStatus, descartado por travar transação e impedir rollback | TRANSCRICAO | [09:04] Bruno |
+| RFC-ALT-02 | docs/RFC.md | Alternativa Descartada | Fila externa dedicada (Redis Streams), descartada por overengineering | TRANSCRICAO | [09:07] Diego |
+| RFC-ALT-03 | docs/RFC.md | Alternativa Descartada | Trigger de banco para acionar worker, descartado por MySQL não ter LISTEN/NOTIFY | TRANSCRICAO | [09:09] Diego |
+| RFC-ALT-04 | docs/RFC.md | Alternativa Descartada | Garantia exactly-once, descartada pela complexidade de coordenação entre as partes | TRANSCRICAO | [09:25] Diego |
+| RFC-OQ-01 | docs/RFC.md | Questão em Aberto | Alerta ao cliente (e-mail) após falhas consecutivas, adiado para fase futura | TRANSCRICAO | [09:37] Larissa |
+| RFC-OQ-02 | docs/RFC.md | Questão em Aberto | Rate limiting de envio ao cliente, decisão adiada para observação | TRANSCRICAO | [09:39] Larissa |
+| RFC-OQ-03 | docs/RFC.md | Questão em Aberto | Estratégia de ordenação/particionamento se escalar para múltiplos workers | TRANSCRICAO | [09:13] Diego |
+| RFC-IMP-01 | docs/RFC.md | Impacto ou Risco | changeStatus precisa ser estendido para publicar evento na outbox | CODIGO | src/modules/orders/order.service.ts |
+| RFC-IMP-02 | docs/RFC.md | Impacto ou Risco | Novo processo worker precisa ser mantido no ar de forma independente da API | TRANSCRICAO | [09:11] Diego |
+| RFC-IMP-03 | docs/RFC.md | Impacto ou Risco | Revisão de segurança de Sofia reservada (2 dias úteis) antes do deploy | TRANSCRICAO | [09:46] Sofia |
+| RFC-IMP-04 | docs/RFC.md | Impacto ou Risco | Risco comercial de churn da Atlas em caso de atraso na entrega | TRANSCRICAO | [09:00] Marcos |
+| RFC-IMP-05 | docs/RFC.md | Impacto ou Risco | Janela de indisponibilidade de cliente de até ~15h antes da dead letter | TRANSCRICAO | [09:17] Diego |
+| RFC-IMP-06 | docs/RFC.md | Impacto ou Risco | Crescimento da tabela webhook_outbox, arquivamento fora do escopo | TRANSCRICAO | [09:08] Diego |
