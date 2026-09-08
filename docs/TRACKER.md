@@ -1,8 +1,8 @@
 # Tracker de Rastreabilidade
 
-Tabela que mapeia cada item registrado nos documentos de design (FDD, RFC, ADRs) à sua origem real, na
-transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs, o RFC
-e o FDD.
+Tabela que mapeia cada item registrado nos documentos de design (PRD, RFC, FDD, ADRs) à sua origem real, na
+transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs, o RFC,
+o FDD e o PRD.
 
 | ID | Documento | Tipo | Conteúdo (resumo) | Fonte | Localização |
 | --- | --- | --- | --- | --- | --- |
@@ -149,3 +149,70 @@ e o FDD.
 | FDD-RISCO-02 | docs/FDD.md | Risco | Cliente externo pode ficar indisponível além da janela de retry de ~15h | TRANSCRICAO | [09:16] Diego |
 | FDD-RISCO-03 | docs/FDD.md | Risco | Crescimento não controlado da tabela webhook_outbox sem arquivamento nesta fase | TRANSCRICAO | [09:08] Diego |
 | FDD-RISCO-04 | docs/FDD.md | Risco | Limitação de ordenação global ao escalar para múltiplos workers | TRANSCRICAO | [09:13] Diego |
+| PRD-PROB-001 | docs/PRD.md | Problema | Clientes B2B fazem polling caro e lento em GET /orders e pediram notificação em tempo real | TRANSCRICAO | [09:00] Marcos |
+| PRD-PROB-002 | docs/PRD.md | Problema | Atlas sinaliza risco de migrar para concorrente se a feature não for entregue até fim do trimestre | TRANSCRICAO | [09:00] Marcos |
+| PRD-GOAL-001 | docs/PRD.md | Objetivo | Latência de entrega abaixo de 10s, piso de 2s definido pelo ciclo do worker | TRANSCRICAO | [09:02] Marcos |
+| PRD-GOAL-002 | docs/PRD.md | Objetivo | Nenhum evento elegível deve se perder silenciosamente, entregue ou movido para dead letter | TRANSCRICAO | [09:15] Diego |
+| PRD-SCOPE-001 | docs/PRD.md | Escopo | CRUD de configuração de webhook por customer (cadastro, edição, remoção, listagem) | TRANSCRICAO | [09:31] Marcos |
+| PRD-SCOPE-002 | docs/PRD.md | Escopo | Registro do evento na outbox dentro da mesma transação da mudança de status | TRANSCRICAO | [09:34] Diego |
+| PRD-SCOPE-003 | docs/PRD.md | Escopo | Worker em processo separado com polling a cada 2 segundos | TRANSCRICAO | [09:10] Larissa |
+| PRD-SCOPE-004 | docs/PRD.md | Escopo | Retry com backoff, Dead Letter Queue e replay administrativo restrito a ADMIN | TRANSCRICAO | [09:15] Diego |
+| PRD-SCOPE-005 | docs/PRD.md | Escopo | Histórico de entregas de um webhook, últimos 100 registros | TRANSCRICAO | [09:34] Marcos |
+| PRD-SCOPE-006 | docs/PRD.md | Escopo | HMAC-SHA256, secret por endpoint com rotação, TLS obrigatório e limite de 64KB | TRANSCRICAO | [09:19] Sofia |
+| PRD-SCOPE-007 | docs/PRD.md | Escopo | Garantia at-least-once com X-Event-Id para deduplicação do lado do cliente | TRANSCRICAO | [09:24] Diego |
+| PRD-SCOPE-008 | docs/PRD.md | Escopo | Novo módulo src/modules/webhooks e entry-point src/worker.ts seguindo padrões existentes | TRANSCRICAO | [09:27] Bruno |
+| PRD-OUT-001 | docs/PRD.md | Fora de Escopo | Alerta por e-mail ao cliente após falhas consecutivas, adiado para fase futura | TRANSCRICAO | [09:37] Larissa |
+| PRD-OUT-002 | docs/PRD.md | Fora de Escopo | Rate limiting de envio ao cliente, decisão de observar antes de implementar | TRANSCRICAO | [09:39] Larissa |
+| PRD-OUT-003 | docs/PRD.md | Fora de Escopo | Ordenação global entre pedidos se escalar para múltiplos workers, limitação conhecida | TRANSCRICAO | [09:12] Diego |
+| PRD-OUT-004 | docs/PRD.md | Fora de Escopo | Dashboard visual para o cliente acompanhar webhooks, fora de escopo desta fase | TRANSCRICAO | [09:39] Larissa |
+| PRD-OUT-005 | docs/PRD.md | Fora de Escopo | Arquivamento das linhas já entregues na outbox, fora do escopo desta feature | TRANSCRICAO | [09:08] Diego |
+| PRD-OUT-006 | docs/PRD.md | Fora de Escopo | Webhooks inbound, feature é exclusivamente outbound | TRANSCRICAO | [09:02] Marcos |
+| PRD-FR-001 | docs/PRD.md | Requisito Funcional | Cadastro de webhook (URL, secret gerada, filtro de status) | TRANSCRICAO | [09:31] Marcos |
+| PRD-FR-002 | docs/PRD.md | Requisito Funcional | Edição de webhook cadastrado | TRANSCRICAO | [09:33] Bruno |
+| PRD-FR-003 | docs/PRD.md | Requisito Funcional | Remoção de webhook cadastrado | TRANSCRICAO | [09:33] Bruno |
+| PRD-FR-004 | docs/PRD.md | Requisito Funcional | Listagem paginada dos webhooks de um customer | TRANSCRICAO | [09:33] Bruno |
+| PRD-FR-005 | docs/PRD.md | Requisito Funcional | Histórico de entregas de um webhook (últimos 100 registros) | TRANSCRICAO | [09:34] Marcos |
+| PRD-FR-006 | docs/PRD.md | Requisito Funcional | Rotação de secret com grace period de 24h para a secret antiga | TRANSCRICAO | [09:21] Sofia |
+| PRD-FR-007-A | docs/PRD.md | Requisito Funcional | Registro do evento de notificação na outbox dentro da transação de changeStatus | TRANSCRICAO | [09:41] Bruno |
+| PRD-FR-007-B | docs/PRD.md | Requisito Funcional | Ponto de integração real da inserção na outbox dentro de changeStatus | CODIGO | src/modules/orders/order.service.ts:126 |
+| PRD-FR-008 | docs/PRD.md | Requisito Funcional | Processamento assíncrono pelo worker com entrega HTTP assinada e timeout de 10s | TRANSCRICAO | [09:42] Diego |
+| PRD-FR-009 | docs/PRD.md | Requisito Funcional | Retry com backoff exponencial (1m/5m/30m/2h/12h) | TRANSCRICAO | [09:17] Diego |
+| PRD-FR-010 | docs/PRD.md | Requisito Funcional | Dead Letter Queue para falhas permanentes de entrega | TRANSCRICAO | [09:18] Diego |
+| PRD-FR-011 | docs/PRD.md | Requisito Funcional | Replay administrativo de eventos em dead letter, restrito a ADMIN, com auditoria | TRANSCRICAO | [09:36] Sofia |
+| PRD-NFR-001 | docs/PRD.md | Requisito Não Funcional | Timeout de 10 segundos por chamada HTTP de entrega | TRANSCRICAO | [09:42] Diego |
+| PRD-NFR-002 | docs/PRD.md | Requisito Não Funcional | Assinatura HMAC-SHA256 do corpo da notificação via header X-Signature | TRANSCRICAO | [09:20] Sofia |
+| PRD-NFR-003 | docs/PRD.md | Requisito Não Funcional | Secret exclusiva por endpoint de webhook, nunca uma secret global | TRANSCRICAO | [09:21] Sofia |
+| PRD-NFR-004 | docs/PRD.md | Requisito Não Funcional | Rotação de secret com grace period de 24 horas | TRANSCRICAO | [09:21] Sofia |
+| PRD-NFR-005 | docs/PRD.md | Requisito Não Funcional | URL do webhook obrigatoriamente HTTPS, HTTP é recusado | TRANSCRICAO | [09:23] Sofia |
+| PRD-NFR-006-A | docs/PRD.md | Requisito Não Funcional | Endpoint de replay restrito a role ADMIN | TRANSCRICAO | [09:36] Sofia |
+| PRD-NFR-006-B | docs/PRD.md | Requisito Não Funcional | requireRole reaproveitado para restringir o replay a ADMIN | CODIGO | src/middlewares/auth.middleware.ts:49 |
+| PRD-NFR-007-A | docs/PRD.md | Requisito Não Funcional | Logger Pino já configurado é reaproveitado sem introduzir nova biblioteca | TRANSCRICAO | [09:29] Bruno |
+| PRD-NFR-007-B | docs/PRD.md | Requisito Não Funcional | redactPaths existente do logger precisa ser estendido para secret e assinatura | CODIGO | src/shared/logger/index.ts:4 |
+| PRD-NFR-008 | docs/PRD.md | Requisito Não Funcional | Inserção do evento na outbox precisa ser transacional junto com a mudança de status | TRANSCRICAO | [09:41] Diego |
+| PRD-NFR-009 | docs/PRD.md | Requisito Não Funcional | Garantia at-least-once, cliente deduplica pelo X-Event-Id | TRANSCRICAO | [09:24] Diego |
+| PRD-NFR-010 | docs/PRD.md | Requisito Não Funcional | Payload máximo de 64KB por evento, rejeitado sem truncar | TRANSCRICAO | [09:23] Sofia |
+| PRD-NFR-011 | docs/PRD.md | Requisito Não Funcional | Ação de replay administrativo registrada em log de auditoria | TRANSCRICAO | [09:36] Sofia |
+| PRD-DEC-001 | docs/PRD.md | Decisão | Padrão Outbox no MySQL para entrega de eventos de webhook | TRANSCRICAO | [09:06] Diego |
+| PRD-DEC-002 | docs/PRD.md | Decisão | Worker em processo separado com polling de 2 segundos | TRANSCRICAO | [09:10] Larissa |
+| PRD-DEC-003 | docs/PRD.md | Decisão | Retry com backoff exponencial e Dead Letter Queue em tabela separada | TRANSCRICAO | [09:17] Larissa |
+| PRD-DEC-004 | docs/PRD.md | Decisão | HMAC-SHA256 com secret por endpoint e rotação com grace period | TRANSCRICAO | [09:22] Sofia |
+| PRD-DEC-005 | docs/PRD.md | Decisão | Garantia at-least-once com idempotência via X-Event-Id | TRANSCRICAO | [09:26] Larissa |
+| PRD-DEC-006 | docs/PRD.md | Decisão | Reuso dos padrões arquiteturais já existentes no projeto | TRANSCRICAO | [09:30] Larissa |
+| PRD-DEP-001 | docs/PRD.md | Dependência | Revisão de segurança da Sofia (2 dias úteis) reservada antes do deploy | TRANSCRICAO | [09:46] Sofia |
+| PRD-RISK-001 | docs/PRD.md | Risco | Atraso na entrega gera risco de churn comercial da Atlas | TRANSCRICAO | [09:00] Marcos |
+| PRD-RISK-002 | docs/PRD.md | Risco | Cliente externo indisponível além da janela de retry de ~15h | TRANSCRICAO | [09:16] Diego |
+| PRD-RISK-003 | docs/PRD.md | Risco | Revisão de segurança pode apontar mudanças estruturais tarde no cronograma | TRANSCRICAO | [09:46] Sofia |
+| PRD-RISK-004 | docs/PRD.md | Risco | Crescimento não controlado da tabela de outbox sem arquivamento nesta fase | TRANSCRICAO | [09:08] Diego |
+| PRD-RISK-005 | docs/PRD.md | Risco | Limitação de ordenação ao escalar para múltiplos workers | TRANSCRICAO | [09:13] Diego |
+| PRD-AC-001 | docs/PRD.md | Critério de Aceitação | CRUD completo de webhook funcional (cadastro, edição, remoção, listagem) | TRANSCRICAO | [09:33] Bruno |
+| PRD-AC-002 | docs/PRD.md | Critério de Aceitação | Evento de outbox atômico com a transação de changeStatus, sem exceção | TRANSCRICAO | [09:41] Diego |
+| PRD-AC-003 | docs/PRD.md | Critério de Aceitação | Latência de entrega dentro do teto de 10 segundos combinado com os clientes | TRANSCRICAO | [09:02] Marcos |
+| PRD-AC-004 | docs/PRD.md | Critério de Aceitação | Assinatura HMAC-SHA256 válida e X-Event-Id único e estável por evento | TRANSCRICAO | [09:25] Diego |
+| PRD-AC-005 | docs/PRD.md | Critério de Aceitação | Retry segue exatamente a progressão 1m/5m/30m/2h/12h antes da dead letter | TRANSCRICAO | [09:17] Diego |
+| PRD-AC-006 | docs/PRD.md | Critério de Aceitação | Replay de dead letter restrito a ADMIN, com ação registrada em auditoria | TRANSCRICAO | [09:36] Sofia |
+| PRD-AC-007 | docs/PRD.md | Critério de Aceitação | Secret anterior permanece válida por exatamente 24h após rotação | TRANSCRICAO | [09:21] Sofia |
+| PRD-AC-008 | docs/PRD.md | Critério de Aceitação | Nenhum payload acima de 64KB é enviado, sem truncamento | TRANSCRICAO | [09:24] Larissa |
+| PRD-AC-009 | docs/PRD.md | Critério de Aceitação | Histórico das últimas entregas de um webhook consultável pela API | TRANSCRICAO | [09:34] Marcos |
+| PRD-AC-010 | docs/PRD.md | Critério de Aceitação | Webhooks com URL não HTTPS são rejeitados antes de qualquer persistência | TRANSCRICAO | [09:23] Sofia |
+| PRD-TEST-001 | docs/PRD.md | Estratégia de Teste | Testes de integração cobrindo o fluxo ponta a ponta do order.service | TRANSCRICAO | [09:46] Larissa |
+| PRD-TEST-002 | docs/PRD.md | Estratégia de Teste | Revisão de segurança dedicada da Sofia como gate obrigatório antes do deploy | TRANSCRICAO | [09:46] Sofia |

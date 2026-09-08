@@ -33,3 +33,13 @@ Comando usado para gerar o FDD:
 ```
 /criador-adr @repo-base/descricao-desafio.md Use a skill FDD para gerar a FDD seguindo rigorosamente as regras do desafio. Perceba que a sequência de criação dos documentos foram mudados; considere no contexto apenas as arquivos ADR e RFC.
 ```
+
+## PRD
+
+A skill `criador-prd` gerou o `docs/PRD.md` por último, invertendo a ordem usual do documento (normalmente o primeiro a ser escrito) porque o desafio pede exatamente essa sequência didática. Como entrada, usou a transcrição, o código-fonte e, principalmente, o RFC, o FDD, os 6 ADRs e o Tracker já fechados nas etapas anteriores, que sozinhos já cobriam quase toda a estrutura interna do PRD (público-alvo, objetivos, escopo, decisões, riscos). A primeira lacuna real identificada foi a ausência de números de impacto do problema (custo ou tempo perdido pelo polling) na transcrição; ao tentar preencher isso por entrevista, o usuário interrompeu o processo apontando que o formato de Tracker deste desafio só aceita `TRANSCRICAO` ou `CODIGO` como fonte, então uma resposta minha na conversa não teria como ser rastreada. Isso mudou o approach: em vez de entrevistar, todo ponto sem origem no material (prioridade dos requisitos, meta de disponibilidade, métricas de observabilidade, tipos de teste) passou a ser assumido como hipótese, marcado explicitamente no texto, sem bloquear a entrega. O resultado saiu com 11 requisitos funcionais e 2 objetivos quantificados, acima do mínimo exigido. Na sequência, as linhas do PRD foram acrescentadas ao `docs/TRACKER.md` já existente, reaproveitando as citações já levantadas durante a extração.
+
+Comando usado para gerar o PRD:
+
+```
+/criador-prd crie um PRD seguindo rigorosamente às especificações do @repo-base/descricao-desafio.md. Note que, embora o PRD normalmente seja o primeiro a ser criado, como o escopo é didático de um desafio, optou-se por deixá-lo por último. Isso significa que deve levar em conta os outros arquivos já criados como TRACKER, ADRs, RFC e FDD que estão em @repo-base/docs/. Como entrada, use @repo-base/TRANSCRICAO.md e @repo-base/src/.
+```
