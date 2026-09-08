@@ -23,3 +23,13 @@ Comando usado para gerar o RFC:
 ```
 /criador-rfc  @README.md @repo-base/TRANSCRICAO.md @repo-base/src/ use o criador de RFC para criar uma nova RFC para o projeto. Normalmente uma RFC é criada para discutir um assunto para tomar desições basendo-se nas discussões e posteriomente gerar a ADR a partir dela, mas a RFC está sendo criada depois porque a discussão ocorreu em uma reunião, que é a transcrição fornecida. O fluxo em si não mudou, mas a escrita dos documentos estão em ordem mais apropriada para melhorar o resultado do processo. Neste caso, tenha em vista as ADRs que já foram criadas em @repo-base/docs/adrs.
 ```
+
+## FDD
+
+A skill `criador-fdd` gerou o `docs/FDD.md` depois das ADRs e do RFC, na ordem alterada deste desafio, usando a transcrição, o RFC e as 6 ADRs fechadas como entrada, sem tratar o PRD (ainda placeholder) como fonte. Explorou o código-fonte (changeStatus, classes de erro, middlewares, logger, rotas, schema Prisma) para a seção "Integração com o sistema existente". Como o conteúdo técnico já estava fechado, dispensei entrevista longa: os poucos pontos sem origem real ficaram marcados como hipótese no próprio documento. A autorrevisão final confirmou os critérios de aceite, com ressalva sobre payload JSON incompleto em 2 dos 8 contratos.
+
+Comando usado para gerar o FDD:
+
+```
+/criador-adr @repo-base/descricao-desafio.md Use a skill FDD para gerar a FDD seguindo rigorosamente as regras do desafio. Perceba que a sequência de criação dos documentos foram mudados; considere no contexto apenas as arquivos ADR e RFC.
+```

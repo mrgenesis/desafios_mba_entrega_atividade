@@ -1,7 +1,8 @@
 # Tracker de Rastreabilidade
 
-Tabela que mapeia cada item registrado nos documentos de design (RFC, ADRs) à sua origem real, na
-transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs e o RFC.
+Tabela que mapeia cada item registrado nos documentos de design (FDD, RFC, ADRs) à sua origem real, na
+transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação (`src/`). Cobre os 6 ADRs, o RFC
+e o FDD.
 
 | ID | Documento | Tipo | Conteúdo (resumo) | Fonte | Localização |
 | --- | --- | --- | --- | --- | --- |
@@ -80,3 +81,71 @@ transcrição da reunião (`TRANSCRICAO.md`) ou no código-fonte da aplicação 
 | RFC-IMP-04 | docs/RFC.md | Impacto ou Risco | Risco comercial de churn da Atlas em caso de atraso na entrega | TRANSCRICAO | [09:00] Marcos |
 | RFC-IMP-05 | docs/RFC.md | Impacto ou Risco | Janela de indisponibilidade de cliente de até ~15h antes da dead letter | TRANSCRICAO | [09:17] Diego |
 | RFC-IMP-06 | docs/RFC.md | Impacto ou Risco | Crescimento da tabela webhook_outbox, arquivamento fora do escopo | TRANSCRICAO | [09:08] Diego |
+| FDD-CTX-01 | docs/FDD.md | Requisito Funcional | Escopo é outbound only, cliente só recebe, nunca envia webhook de volta | TRANSCRICAO | [09:02] Marcos |
+| FDD-CTX-02 | docs/FDD.md | Restrição | changeStatus já executa update em orders, insert em history e ajuste de estoque numa única transação | CODIGO | src/modules/orders/order.service.ts |
+| FDD-CTX-03 | docs/FDD.md | Restrição | Notificação não pode acoplar disponibilidade do cliente externo à transação principal | TRANSCRICAO | [09:04] Bruno |
+| FDD-OBJ-01 | docs/FDD.md | Objetivo Técnico | Atomicidade entre mudança de status do pedido e registro do evento de notificação | TRANSCRICAO | [09:06] Diego |
+| FDD-OBJ-02 | docs/FDD.md | Objetivo Técnico | Latência mínima de 2s e teto de 10s definido pelos clientes como "tempo real" | TRANSCRICAO | [09:02] Marcos |
+| FDD-OBJ-03 | docs/FDD.md | Objetivo Técnico | Entrega at-least-once com X-Event-Id único para dedup do lado do cliente | TRANSCRICAO | [09:25] Diego |
+| FDD-OBJ-04 | docs/FDD.md | Objetivo Técnico | Nenhuma falha permanente perdida silenciosamente, evento preservado em dead letter | TRANSCRICAO | [09:18] Diego |
+| FDD-OBJ-05 | docs/FDD.md | Objetivo Técnico | Secret isolada por endpoint, vazamento não compromete outros clientes | TRANSCRICAO | [09:21] Sofia |
+| FDD-OBJ-06 | docs/FDD.md | Objetivo Técnico | Ordenação por pedido individual garantida apenas enquanto for single-worker | TRANSCRICAO | [09:12] Diego |
+| FDD-ESCOPO-01 | docs/FDD.md | Escopo | Inserção na webhook_outbox via publishWebhookEvent(tx, order, fromStatus, toStatus) | TRANSCRICAO | [09:41] Bruno |
+| FDD-ESCOPO-02 | docs/FDD.md | Escopo | Worker em processo separado (src/worker.ts) com polling a cada 2 segundos | TRANSCRICAO | [09:10] Larissa |
+| FDD-ESCOPO-03 | docs/FDD.md | Escopo | Retry com backoff exponencial e Dead Letter Queue em tabela separada | TRANSCRICAO | [09:17] Larissa |
+| FDD-ESCOPO-04 | docs/FDD.md | Escopo | Endpoint admin de replay de dead letter restrito a role ADMIN, com log de auditoria | TRANSCRICAO | [09:36] Sofia |
+| FDD-ESCOPO-05 | docs/FDD.md | Escopo | CRUD de configuração de webhook (POST/PATCH/DELETE/GET) com filtro por status | TRANSCRICAO | [09:33] Bruno |
+| FDD-ESCOPO-06 | docs/FDD.md | Escopo | Rotação de secret com grace period de 24h para a secret antiga | TRANSCRICAO | [09:21] Sofia |
+| FDD-ESCOPO-07 | docs/FDD.md | Escopo | Endpoint de histórico de entregas, últimos 100 registros | TRANSCRICAO | [09:34] Marcos |
+| FDD-ESCOPO-08 | docs/FDD.md | Escopo | HMAC-SHA256, TLS obrigatório na URL e limite de 64KB no payload | TRANSCRICAO | [09:23] Sofia |
+| FDD-ESCOPO-09 | docs/FDD.md | Escopo | Módulo src/modules/webhooks segue estrutura já usada nos demais módulos | TRANSCRICAO | [09:27] Bruno |
+| FDD-FORA-01 | docs/FDD.md | Fora de Escopo | Alerta por e-mail ao cliente após falhas consecutivas, adiado para fase futura | TRANSCRICAO | [09:37] Larissa |
+| FDD-FORA-02 | docs/FDD.md | Fora de Escopo | Rate limiting de envio ao cliente, decisão de observar antes de implementar | TRANSCRICAO | [09:39] Larissa |
+| FDD-FORA-03 | docs/FDD.md | Fora de Escopo | Ordenação global entre pedidos se escalar para múltiplos workers, limitação conhecida | TRANSCRICAO | [09:13] Larissa |
+| FDD-FORA-04 | docs/FDD.md | Fora de Escopo | Dashboard visual para o cliente acompanhar webhooks, fora de escopo desta fase | TRANSCRICAO | [09:40] Larissa |
+| FDD-FORA-05 | docs/FDD.md | Fora de Escopo | Arquivamento das linhas já entregues em webhook_outbox, fora do escopo | TRANSCRICAO | [09:08] Diego |
+| FDD-FORA-06 | docs/FDD.md | Fora de Escopo | Webhooks inbound, feature é exclusivamente outbound | TRANSCRICAO | [09:03] Sofia |
+| FDD-FLUXO-01 | docs/FDD.md | Fluxo | Inserção na outbox precisa estar na mesma transação, senão perde a garantia | TRANSCRICAO | [09:41] Diego |
+| FDD-FLUXO-02 | docs/FDD.md | Fluxo | Payload gravado como snapshot renderizado no momento da inserção, não apenas order_id | TRANSCRICAO | [09:52] Larissa |
+| FDD-FLUXO-03 | docs/FDD.md | Fluxo | Worker lê pendentes em batch pequeno, processa e marca como entregue | TRANSCRICAO | [09:08] Diego |
+| FDD-FLUXO-04 | docs/FDD.md | Fluxo | Progressão de retry 1m/5m/30m/2h/12h entre tentativas sucessivas | TRANSCRICAO | [09:17] Diego |
+| FDD-FLUXO-05 | docs/FDD.md | Fluxo | Replay administrativo recoloca o evento na outbox como pendente | TRANSCRICAO | [09:18] Diego |
+| FDD-CONTRATO-01 | docs/FDD.md | Contrato Público | POST /api/v1/webhooks: cadastro com url, secret gerada na criação, filtro de status | TRANSCRICAO | [09:31] Marcos |
+| FDD-CONTRATO-02 | docs/FDD.md | Contrato Público | PATCH /api/v1/webhooks/:id: edição de webhook cadastrado | TRANSCRICAO | [09:33] Bruno |
+| FDD-CONTRATO-03 | docs/FDD.md | Contrato Público | DELETE /api/v1/webhooks/:id: remoção de webhook cadastrado | TRANSCRICAO | [09:33] Bruno |
+| FDD-CONTRATO-04 | docs/FDD.md | Contrato Público | GET /api/v1/webhooks: listagem dos webhooks de um customer | TRANSCRICAO | [09:33] Bruno |
+| FDD-CONTRATO-05 | docs/FDD.md | Contrato Público | GET /webhooks/:id/deliveries: histórico de entregas | TRANSCRICAO | [09:34] Marcos |
+| FDD-CONTRATO-06 | docs/FDD.md | Contrato Público | POST /webhooks/:id/rotate-secret: rotação de secret com grace period | TRANSCRICAO | [09:21] Sofia |
+| FDD-CONTRATO-07 | docs/FDD.md | Contrato Público | POST /admin/webhooks/dead-letter/:id/replay: replay manual restrito a ADMIN | TRANSCRICAO | [09:18] Diego |
+| FDD-CONTRATO-08 | docs/FDD.md | Contrato Público | Payload outbound com event_id, event_type, timestamp, order_id, order_number, from_status, to_status, customer_id, total_cents | TRANSCRICAO | [09:43] Diego |
+| FDD-CONTRATO-09 | docs/FDD.md | Contrato Público | Headers X-Event-Id, X-Signature, X-Timestamp, X-Webhook-Id no envio ao cliente | TRANSCRICAO | [09:44] Sofia |
+| FDD-ERRO-01 | docs/FDD.md | Erro | WEBHOOK_NOT_FOUND: webhook com id informado não existe | TRANSCRICAO | [09:28] Bruno |
+| FDD-ERRO-02 | docs/FDD.md | Erro | WEBHOOK_INVALID_URL: URL cadastrada não usa HTTPS | TRANSCRICAO | [09:23] Sofia |
+| FDD-ERRO-03 | docs/FDD.md | Erro | WEBHOOK_SECRET_REQUIRED: endpoint sem secret ativa válida | TRANSCRICAO | [09:28] Bruno |
+| FDD-ERRO-04 | docs/FDD.md | Erro | WEBHOOK_PAYLOAD_TOO_LARGE: payload acima de 64KB é rejeitado, nunca truncado | TRANSCRICAO | [09:24] Larissa |
+| FDD-ERRO-05 | docs/FDD.md | Erro | Timeout de 10s na chamada HTTP de entrega é tratado como falha | TRANSCRICAO | [09:42] Diego |
+| FDD-OBS-01 | docs/FDD.md | Observabilidade | Logger Pino já configurado é reaproveitado sem introduzir nova biblioteca | CODIGO | src/shared/logger/index.ts |
+| FDD-OBS-02 | docs/FDD.md | Observabilidade | redactPaths existente precisa ser estendido para secret e assinatura do módulo | CODIGO | src/shared/logger/index.ts |
+| FDD-DEP-01 | docs/FDD.md | Dependência | @prisma/client já no projeto, reaproveitado sem novo client | CODIGO | package.json |
+| FDD-DEP-02 | docs/FDD.md | Dependência | express já no projeto, reaproveitado para o novo módulo | CODIGO | package.json |
+| FDD-DEP-03 | docs/FDD.md | Dependência | zod já no projeto, reaproveitado para os novos schemas | CODIGO | package.json |
+| FDD-DEP-04 | docs/FDD.md | Dependência | pino já no projeto, reaproveitado no worker e no módulo webhooks | CODIGO | package.json |
+| FDD-DEP-05 | docs/FDD.md | Dependência | node:crypto nativo usado para HMAC-SHA256, sem nova dependência externa | CODIGO | package.json |
+| FDD-INTEG-01 | docs/FDD.md | Integração com Sistema Existente | changeStatus estendido para chamar publishWebhookEvent dentro da transação | CODIGO | src/modules/orders/order.service.ts |
+| FDD-INTEG-02 | docs/FDD.md | Integração com Sistema Existente | Novas subclasses de erro WEBHOOK_* estendendo AppError, no padrão já existente | CODIGO | src/shared/errors/http-errors.ts |
+| FDD-INTEG-03 | docs/FDD.md | Integração com Sistema Existente | Novas classes de erro reexportadas no index de erros, no padrão já existente | CODIGO | src/shared/errors/index.ts |
+| FDD-INTEG-04 | docs/FDD.md | Integração com Sistema Existente | Error middleware centralizado reaproveitado sem alteração, já reconhece AppError | CODIGO | src/middlewares/error.middleware.ts |
+| FDD-INTEG-05 | docs/FDD.md | Integração com Sistema Existente | requireRole('ADMIN') reaproveitado para restringir o endpoint de replay | CODIGO | src/middlewares/auth.middleware.ts |
+| FDD-INTEG-06 | docs/FDD.md | Integração com Sistema Existente | Logger Pino reaproveitado pela API e pelo worker, redactPaths estendido | CODIGO | src/shared/logger/index.ts |
+| FDD-INTEG-07 | docs/FDD.md | Integração com Sistema Existente | server.ts serve de modelo direto para o novo entry-point worker.ts | CODIGO | src/server.ts |
+| FDD-INTEG-08 | docs/FDD.md | Integração com Sistema Existente | routes/index.ts precisa registrar o novo router do módulo de webhooks | CODIGO | src/routes/index.ts |
+| FDD-INTEG-09 | docs/FDD.md | Integração com Sistema Existente | buildControllers em app.ts precisa incluir repository/service/controller de webhooks | CODIGO | src/app.ts |
+| FDD-INTEG-10 | docs/FDD.md | Integração com Sistema Existente | schema.prisma recebe novos models seguindo convenções já estabelecidas (uuid, @@map, índices) | CODIGO | prisma/schema.prisma |
+| FDD-AC-01 | docs/FDD.md | Critério de Aceite | Evento não pode existir se a transação de changeStatus sofrer rollback | TRANSCRICAO | [09:40] Bruno |
+| FDD-AC-02 | docs/FDD.md | Critério de Aceite | Endpoint de replay de dead letter só acessível a usuários com role ADMIN | TRANSCRICAO | [09:36] Sofia |
+| FDD-AC-03 | docs/FDD.md | Critério de Aceite | Secret anterior permanece válida por exatamente 24h após rotação | TRANSCRICAO | [09:21] Sofia |
+| FDD-AC-04 | docs/FDD.md | Critério de Aceite | Nenhum payload acima de 64KB é enviado ao cliente | TRANSCRICAO | [09:24] Larissa |
+| FDD-RISCO-01 | docs/FDD.md | Risco | Atraso na entrega gera risco de churn comercial da Atlas | TRANSCRICAO | [09:00] Marcos |
+| FDD-RISCO-02 | docs/FDD.md | Risco | Cliente externo pode ficar indisponível além da janela de retry de ~15h | TRANSCRICAO | [09:16] Diego |
+| FDD-RISCO-03 | docs/FDD.md | Risco | Crescimento não controlado da tabela webhook_outbox sem arquivamento nesta fase | TRANSCRICAO | [09:08] Diego |
+| FDD-RISCO-04 | docs/FDD.md | Risco | Limitação de ordenação global ao escalar para múltiplos workers | TRANSCRICAO | [09:13] Diego |
